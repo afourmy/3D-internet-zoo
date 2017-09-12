@@ -11,6 +11,7 @@ from os.path import abspath, dirname, join, pardir
 from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
+import xml.etree.ElementTree as etree
 try:
     import simplekml
 except ImportError:
@@ -257,10 +258,10 @@ class PyEarth(QMainWindow):
         import_shapefile.setStatusTip('Import a shapefile')
         import_shapefile.triggered.connect(self.import_shapefile)
         
-        import_project_icon = QIcon(join(path_icons, 'import_project.png'))
-        import_project = QAction(import_project_icon, 'Import a Excel project', self)
-        import_project.setStatusTip('Import a project (Excel format)')
-        import_project.triggered.connect(self.import_project)
+        gml_import_icon = QIcon(join(path_icons, 'gml_import.png'))
+        gml_import = QAction(gml_import_icon, 'Import the Topology Zoo', self)
+        gml_import.setStatusTip('Import the Internet Topology Zoo (GML files)')
+        gml_import.triggered.connect(self.gml_import)
         
         kml_export_icon = QIcon(join(path_icons, 'kml_export.png'))
         kml_export = QAction(kml_export_icon, 'KML Export', self)
@@ -271,7 +272,7 @@ class PyEarth(QMainWindow):
         toolbar.resize(1500, 1500)
         toolbar.setIconSize(QSize(70, 70))
         toolbar.addAction(import_shapefile)
-        toolbar.addAction(import_project)
+        toolbar.addAction(gml_import)
         toolbar.addAction(kml_export)
         
         # KML export window
@@ -283,21 +284,24 @@ class PyEarth(QMainWindow):
         
         layout = QGridLayout(central_widget)
         layout.addWidget(self.view, 0, 0)
+        
+        self.path = 'C:\\Users\\minto\\Desktop\\Internet 3D visualizer\\dataset\\Peer1.gml'
+        # self.gml_import()
                 
     def import_shapefile(self):
         self.view.shapefile = QFileDialog.getOpenFileName(self, 'Import')[0]
         self.view.create_polygons()
-        
-    def import_project(self):
-        filepath = QFileDialog.getOpenFileName(self, 'Import project', 
-                                                        self.path_projects)[0]
-        book = xlrd.open_workbook(filepath)
-        for obj_type, obj_class in (('nodes', Node), ('links', Link)):
-            sheet = book.sheet_by_name(obj_type)
-            properties = sheet.row_values(0)
-            for row in range(1, sheet.nrows):
-                obj_class(self, **dict(zip(properties, sheet.row_values(row))))
-            self.view.generate_objects()
+            
+    def gml_import(self):
+        import networkx as nx
+        graph = nx.read_gml(self.path)
+        # print(graph.node)
+        for name, properties in graph.node.items():
+            properties['name'] = name
+            properties = {k.lower(): v for k, v in properties.items()}
+            Node(self, **properties)
+        print(self.view.nodes)
+        self.view.generate_objects()
             
     def kml_export(self):
         self.kml_export_window.show()
