@@ -1,3 +1,4 @@
+import os
 import pyproj
 import shapefile
 import shapely.geometry
@@ -17,9 +18,9 @@ try:
 except ImportError:
     warnings.warn('simplekml not installed: export to google earth disabled')
 try:
-    import xlrd
+    import networkx as nx
 except ImportError:
-    warnings.warn('xlrd not installed: import of project disabled')
+    warnings.warn('networkx missing: "pip install networkx"')
     
 class View(QOpenGLWidget):
     
@@ -89,8 +90,8 @@ class View(QOpenGLWidget):
         glNewList(self.objects, GL_COMPILE)
         for node in self.nodes.values():
             glPushMatrix()
-            node.ccef = self.LLH_to_ECEF(node.latitude, node.longitude, 70000)
-            glTranslatef(*node.ccef)
+            node.ecef = self.LLH_to_ECEF(node.latitude, node.longitude, 70000)
+            glTranslatef(*node.ecef)
             node = gluNewQuadric()
             gluQuadricNormals(node, GLU_SMOOTH)
             glColor(0, 0, 0)
@@ -99,9 +100,13 @@ class View(QOpenGLWidget):
             glPopMatrix()
         for link in self.links.values():
             glColor(255, 0, 0)
+            try:
+                link.source.ecef, link.destination.ecef
+            except AttributeError:
+                continue
             glBegin(GL_LINES)
-            glVertex3f(*link.source.ccef)
-            glVertex3f(*link.destination.ccef)
+            glVertex3f(*link.source.ecef)
+            glVertex3f(*link.destination.ecef)
             glEnd()
         glEndList()
                 
@@ -179,7 +184,7 @@ class GoogleEarthExport(QWidget):
         node_size = QLabel('Node label size')
         self.node_size = QLineEdit('2')
         
-        path = 'https://raw.githubusercontent.com/afourmy/pyEarth/master/images/node.png'
+        path = 'https://raw.githubusercontent.com/afourmy/pyEarth/master/icons/node.png'
         self.path_edit = QLineEdit(path)
         
         line_width = QLabel('Line width')
@@ -210,7 +215,7 @@ class GoogleEarthExport(QWidget):
         point_style.iconstyle.icon.href = self.path_edit.text()
         
         for node in self.controller.view.nodes.values():
-            point = kml.newpoint(name=node.name, description=node.description)
+            point = kml.newpoint(name=node.name)
             point.coords = node.coords
             point.style = point_style
             
@@ -219,7 +224,7 @@ class GoogleEarthExport(QWidget):
         line_style.linestyle.width = self.line_width.text()
             
         for link in self.controller.view.links.values():
-            line = kml.newlinestring(name=link.name, description=link.description) 
+            line = kml.newlinestring(name=link.name) 
             line.coords = link.coords
             line.style = line_style
             
@@ -246,8 +251,7 @@ class PyEarth(QMainWindow):
         self.setCentralWidget(central_widget)
         
         # paths
-        self.path_shapefiles = join(path_app, pardir, 'shapefiles')
-        self.path_projects = join(path_app, pardir, 'projects')
+        self.path_graphs = join(path_app, 'dataset')
         path_icons = join(path_app, 'icons')
         
         # menu
@@ -284,23 +288,31 @@ class PyEarth(QMainWindow):
         
         layout = QGridLayout(central_widget)
         layout.addWidget(self.view, 0, 0)
-        
-        self.path = 'C:\\Users\\minto\\Desktop\\Internet 3D visualizer\\dataset\\Peer1.gml'
-        # self.gml_import()
                 
     def import_shapefile(self):
         self.view.shapefile = QFileDialog.getOpenFileName(self, 'Import')[0]
         self.view.create_polygons()
             
     def gml_import(self):
-        import networkx as nx
-        graph = nx.read_gml(self.path)
-        # print(graph.node)
-        for name, properties in graph.node.items():
-            properties['name'] = name
-            properties = {k.lower(): v for k, v in properties.items()}
-            Node(self, **properties)
-        print(self.view.nodes)
+        for file in os.listdir(join(path_app, 'dataset')):
+            try:
+                graph = nx.read_gml(join(self.path_graphs, file))
+            except nx.exception.NetworkXError:
+                continue
+            for name, properties in graph.node.items():
+                properties['name'] = name
+                properties = {k.lower(): v for k, v in properties.items()}
+                try:
+                    Node(self, **properties)
+                except AttributeError:
+                    continue
+            for link in graph.edges():
+                source, destination = link
+                name = '{} - {}'.format(*link)
+                try:
+                    Link(self, name=name, source=source, destination=destination)
+                except KeyError:
+                    continue
         self.view.generate_objects()
             
     def kml_export(self):
@@ -313,4 +325,4 @@ if __name__ == '__main__':
     window.setWindowTitle('pyEarth: a lightweight 3D visualization of the earth')
     window.setFixedSize(900, 900)
     window.show()
-    sys.exit(app.exec_())    
+    sys.exit(app.exec_())
