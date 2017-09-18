@@ -39,7 +39,7 @@ or on the [Network to Code slack](http://networktocode.herokuapp.com "Network to
 
 3D Internet Zoo relies on three Python libraries:
 * simplekml, used for creating KML files for Google Earth.
-* networkx, used for parsing a GML graph
+* networkx, used for parsing GML graphs
 
 You must make sure all these libraries are properly installed:
 ```
