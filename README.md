@@ -38,7 +38,7 @@ or on the [Network to Code slack](http://networktocode.herokuapp.com "Network to
 
 # 3D Internet Zoo dependencies
 
-3D Internet Zoo relies on three Python libraries:
+3D Internet Zoo relies on two Python libraries:
 * simplekml, used for creating KML files for Google Earth.
 * networkx, used for parsing GML graphs
 
