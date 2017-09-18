@@ -8,16 +8,23 @@ Topology Zoo dataset to merge all topologies into a single Google Earth visualiz
 <img src="https://github.com/afourmy/3D-internet-zoo/blob/master/readme/3D_internet_zoo.gif">
 </p>
 
+# The internet network per region
 
-## The internet network per region
+## USA
 
-# USA
+![USA](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/usa.png)
 
-# Europe
+## Europe
 
-# China
+![Europe](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/europe.png)
 
-# Japan
+## China
+
+![China](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/china.png)
+
+## Japan
+
+![Japan](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/japan.png)
 
 # Contact
 
