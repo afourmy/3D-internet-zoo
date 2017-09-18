@@ -4,7 +4,10 @@ The Network Topology Zoo is an ongoing project to collect data network topologie
 The 3D Internet Zoo is a simple python script (50 lines) that uses the Internet
 Topology Zoo dataset to merge all topologies into a single Google Earth visualization of the Internet.
 
-![3D Internet Zoo demo](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/3D_internet_zoo.gif)
+<p align="center"> 
+<img src="https://github.com/afourmy/3D-internet-zoo/blob/master/readme/3D_internet_zoo.gif">
+</p>
+
 
 ## The internet network per region
 
