@@ -26,16 +26,6 @@ The 3D Internet Zoo is a simple python script (50 lines) that uses the [Internet
 
 ![Japan](https://github.com/afourmy/3D-internet-zoo/blob/master/readme/japan.png)
 
-# Contact
-
-You can contact me at my personal email address:
-```
-''.join(map(chr, (97, 110, 116, 111, 105, 110, 101, 46, 102, 111, 
-117, 114, 109, 121, 64, 103, 109, 97, 105, 108, 46, 99, 111, 109)))
-```
-
-or on the [Network to Code slack](http://networktocode.herokuapp.com "Network to Code slack"). (@minto, #enms)
-
 # 3D Internet Zoo dependencies
 
 3D Internet Zoo relies on two Python libraries:
@@ -44,8 +34,7 @@ or on the [Network to Code slack](http://networktocode.herokuapp.com "Network to
 
 You must make sure all these libraries are properly installed:
 ```
-pip install simplekml
-pip install networkx
+pip install -r requirements
 ```
 
 # Credits
