@@ -28,7 +28,7 @@ for file in os.listdir(op.join(path_app, 'dataset')):
         graph = nx.read_gml(op.join(path_graphs, file))
     except nx.exception.NetworkXError:
         continue
-    for name, properties in graph.node.items():
+    for name, properties in graph.nodes.items():
         try:
             point = kml.newpoint(name=name)
             coords = [(
